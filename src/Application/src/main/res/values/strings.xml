@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2013 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+    <string name="ble_not_supported">BLE is not supported</string>
+    <string name="label_data">Data:</string>
+    <string name="no_data">No data</string>
+
+    <string name="label_timer">Timer:</string>
+    <string name="label_timer_full">15</string>
+
+    <string name="label_device_address">Device address:</string>
+    <string name="label_state">State:</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="title_devices">OU NPL CO Monitor</string>
+    <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
+
+    <string name="unknown_device">Unknown device</string>
+    <string name="unknown_characteristic">Unknown characteristic</string>
+    <string name="unknown_service">Unknown service</string>
+
+    <!-- Menu items -->
+    <string name="menu_connect">Connect</string>
+    <string name="menu_disconnect">Disconnect</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_stop">Stop</string>
+
+    <!-- View settings -->
+    <string name="pref_header_view">Control the View</string>
+
+    <string name="pref_view_help">Display Help Window</string>
+    <string name="pref_view_log">Display Com Log</string>
+    <string name="pref_view_send">Display Text/Send</string>
+    <string name="pref_view_dpad">Display D-Pad</string>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_com_settings">Com Port Settings</string>
+    <string name="pref_custom_use">Use Custom Commands</string>
+    <string name="pref_custom_buttons">Use Custom Button Names</string>
+    <string name="pref_com_newline_append">Append newline Character</string>
+    <string name="pref_com_newline_remove">Remove newline Character</string>
+    <string name="pref_log_settings">Logging Format</string>
+    <string name="pref_log_comma">Use Comma Delimeter</string>
+    <string name="pref_log_comma_string">log_comma</string>
+    <string name="pref_log_names">Use Device Names</string>
+    <string name="pref_log_time">Include time in log</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+</resources>
