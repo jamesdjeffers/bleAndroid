@@ -19,7 +19,7 @@
           android:orderInCategory="1"
           android:showAsAction="ifRoom"/>
     <item android:id="@+id/menu_timer"
-        android:title="@string/label_timer"
+        android:title="@string/menu_test"
         android:orderInCategory="100"
         android:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/menu_connect"

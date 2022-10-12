@@ -26,8 +26,4 @@
           android:title="@string/menu_stop"
           android:orderInCategory="101"
           android:showAsAction="ifRoom|withText"/>
-    <item android:id="@+id/menu_timer"
-        android:title="@string/label_timer"
-        android:orderInCategory="102"
-        android:showAsAction="ifRoom|withText"/>
 </menu>

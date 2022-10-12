@@ -74,7 +74,11 @@ public class DeviceControlActivity extends Activity {
             new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
     private boolean mConnected = false;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
-    private BluetoothGattCharacteristic mCharacteristic;
+    private BluetoothGattCharacteristic mCharacteristicCOConcentration;
+    private BluetoothGattCharacteristic mCharacteristicCOTest;
+    private BluetoothGattCharacteristic mCharacteristicStatus;
+    private BluetoothGattCharacteristic mCharacteristicCommand;
+
 
     private int [] mTrendData = new int[15];
     private int mTimeSeconds = 0;
@@ -159,7 +163,7 @@ public class DeviceControlActivity extends Activity {
                                 mNotifyCharacteristic = null;
                             }
                             mBluetoothLeService.readCharacteristic(characteristic);
-                            mCharacteristic = characteristic;
+                            mCharacteristicCOConcentration = characteristic;
                         }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mNotifyCharacteristic = characteristic;
@@ -314,9 +318,17 @@ public class DeviceControlActivity extends Activity {
                     HashMap<String, String> currentCharaData = new HashMap<String, String>();
                     uuid = gattCharacteristic.getUuid().toString();
 
-                    if (uuid.startsWith("19b10001-e8f4")){
-                        Log.d(TAG,uuid);
-                        mCharacteristic = gattCharacteristic;
+                    if (uuid.startsWith("19b10001-e8f2")){
+                        mCharacteristicStatus = gattCharacteristic;
+                    }
+                    else if (uuid.startsWith("19b10001-e8f3")){
+                        mCharacteristicCommand = gattCharacteristic;
+                    }
+                    else if (uuid.startsWith("19b10001-e8f4")){
+                        mCharacteristicCOConcentration = gattCharacteristic;
+                    }
+                    else if(uuid.startsWith("19b10001-e8f5")){
+                        mCharacteristicCOTest = gattCharacteristic;
                     }
                     currentCharaData.put(
                             LIST_NAME, SampleGattAttributes.lookup(uuid, unknownCharaString));
@@ -363,7 +375,7 @@ public class DeviceControlActivity extends Activity {
                 //final BluetoothGattCharacteristic characteristic = mCustomService.getCharacteristic(UUID.fromString("19B10001-E8F4-537E-4F6C-D104768A1214"));
                 //BluetoothGattCharacteristic characteristic = new BluetoothGattCharacteristic(UUID.fromString("19B10001-E8F4-537E-4F6C-D104768A1214"),2,1);
 
-                mBluetoothLeService.readCharacteristic(mCharacteristic);
+                mBluetoothLeService.readCharacteristic(mCharacteristicCOConcentration);
             }
             public void onFinish() {
                 ((TextView) findViewById(R.id.data_timer)).setText("Test Completed");
