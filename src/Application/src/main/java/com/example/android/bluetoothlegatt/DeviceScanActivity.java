@@ -120,6 +120,11 @@ public class DeviceScanActivity extends ListActivity {
             case R.id.menu_stop:
                 scanLeDevice(false);
                 break;
+            case R.id.menu_timer:
+                //startActivity(new Intent(this, SettingsActivity.class));
+                //connectftp();
+                FTPConnectionTest();
+                break;
         }
         return true;
     }

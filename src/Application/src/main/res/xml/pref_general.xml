@@ -26,38 +26,4 @@
             android:title="@string/pref_view_dpad" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/pref_header_com_settings"
-        android:key="@string/pref_header_com_settings">
-
-        <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="append_newline"
-            android:title="@string/pref_com_newline_append" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="remove_newline"
-            android:title="@string/pref_com_newline_remove" />
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/pref_log_settings"
-        android:key="@string/pref_log_settings">
-
-        <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="log_name"
-            android:title="@string/pref_log_names" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="log_time"
-            android:title="@string/pref_log_time" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="@string/pref_log_comma_string"
-            android:title="@string/pref_log_comma" />
-    </PreferenceCategory>
-
 </PreferenceScreen>

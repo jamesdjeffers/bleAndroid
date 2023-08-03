@@ -15,17 +15,19 @@
 -->
 <resources>
     <string name="ble_not_supported">BLE is not supported</string>
-    <string name="label_data">Data:</string>
+    <string name="label_data">Carbon Monoxide (PPM):</string>
     <string name="no_data">No data</string>
 
-    <string name="label_timer">Timer:</string>
+    <string name="label_status">Device Status:</string>
+
+    <string name="label_timer">Timer (seconds):</string>
     <string name="label_timer_full">15</string>
 
-    <string name="label_device_address">Device address:</string>
-    <string name="label_state">State:</string>
-    <string name="connected">Connected</string>
-    <string name="disconnected">Disconnected</string>
-    <string name="title_devices">OU NPL CO Monitor</string>
+    <string name="label_test">Test Results:</string>
+
+    <string name="label_device_address">Previous Test Date:</string>
+    <string name="label_state">Previous Results:</string>
+    <string name="title_devices">OU NPL Monitor</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
 
     <string name="unknown_device">Unknown device</string>
@@ -45,18 +47,6 @@
     <string name="pref_view_log">Display Com Log</string>
     <string name="pref_view_send">Display Text/Send</string>
     <string name="pref_view_dpad">Display D-Pad</string>
-
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_com_settings">Com Port Settings</string>
-    <string name="pref_custom_use">Use Custom Commands</string>
-    <string name="pref_custom_buttons">Use Custom Button Names</string>
-    <string name="pref_com_newline_append">Append newline Character</string>
-    <string name="pref_com_newline_remove">Remove newline Character</string>
-    <string name="pref_log_settings">Logging Format</string>
-    <string name="pref_log_comma">Use Comma Delimeter</string>
-    <string name="pref_log_comma_string">log_comma</string>
-    <string name="pref_log_names">Use Device Names</string>
-    <string name="pref_log_time">Include time in log</string>
 
     <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">

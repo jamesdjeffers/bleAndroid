@@ -37,9 +37,6 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -50,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * For a given BLE device, this Activity provides the user interface to connect, display data,
@@ -66,6 +64,8 @@ public class DeviceControlActivity extends Activity {
 
     private TextView mConnectionState;
     private TextView mDataField;
+    private TextView mStatusField;
+    private TextView mTestField;
     private String mDeviceName;
     private String mDeviceAddress;
     private ExpandableListView mGattServicesList;
@@ -74,24 +74,12 @@ public class DeviceControlActivity extends Activity {
             new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
     private boolean mConnected = false;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
-    private BluetoothGattCharacteristic mCharacteristicCOConcentration;
-    private BluetoothGattCharacteristic mCharacteristicCOTest;
+    private BluetoothGattCharacteristic mCharacteristic;
     private BluetoothGattCharacteristic mCharacteristicStatus;
-    private BluetoothGattCharacteristic mCharacteristicCommand;
+    private BluetoothGattCharacteristic mCharacteristicTest;
 
-
-    private int [] mTrendData = new int[15];
+    private final int [] mTrendData = new int[15];
     private int mTimeSeconds = 0;
-
-    private CountDownTimer cTimer = null;
-
-    private final String LIST_NAME = "NAME";
-    private final String LIST_UUID = "UUID";
-
-    private static String FTPHostName = "";
-    private static final int FTPPort = 21;
-    private static String FTPUsername = "";
-    private static String FTPPassword = "";
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -125,11 +113,9 @@ public class DeviceControlActivity extends Activity {
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
-                updateConnectionState(R.string.connected);
                 invalidateOptionsMenu();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
-                updateConnectionState(R.string.disconnected);
                 invalidateOptionsMenu();
                 clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
@@ -137,15 +123,17 @@ public class DeviceControlActivity extends Activity {
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+            } else if (BluetoothLeService.ACTION_STATUS_AVAILABLE.equals(action)) {
+                displayStatus(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+            } else if (BluetoothLeService.ACTION_TEST_AVAILABLE.equals(action)) {
+                displayTest(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
+
         }
     };
 
     // If a given GATT characteristic is selected, check for supported features.  This sample
-    // demonstrates 'Read' and 'Notify' features.  See
-    // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
-    // list of supported characteristic features.
-    private final ExpandableListView.OnChildClickListener servicesListClickListner =
+    private final ExpandableListView.OnChildClickListener servicesListClickListener =
             new ExpandableListView.OnChildClickListener() {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
@@ -163,7 +151,7 @@ public class DeviceControlActivity extends Activity {
                                 mNotifyCharacteristic = null;
                             }
                             mBluetoothLeService.readCharacteristic(characteristic);
-                            mCharacteristicCOConcentration = characteristic;
+                            mCharacteristic = characteristic;
                         }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mNotifyCharacteristic = characteristic;
@@ -191,18 +179,19 @@ public class DeviceControlActivity extends Activity {
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
 
         // Sets up UI references.
-        //((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
         try {
             ((TextView) findViewById(R.id.device_address)).setText(readCustomFile(CUSTOM_FILE_NAME));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mGattServicesList = (ExpandableListView) findViewById(R.id.gatt_services_list);
-        mGattServicesList.setOnChildClickListener(servicesListClickListner);
-        mConnectionState = (TextView) findViewById(R.id.connection_state);
-        mDataField = (TextView) findViewById(R.id.data_value);
+        mGattServicesList = findViewById(R.id.gatt_services_list);
+        mGattServicesList.setOnChildClickListener(servicesListClickListener);
+        mConnectionState = findViewById(R.id.connection_state);
+        mDataField = findViewById(R.id.data_value);
+        mStatusField = findViewById(R.id.status_value);
+        mTestField = findViewById(R.id.test_value);
 
-        getActionBar().setTitle(mDeviceName);
+        Objects.requireNonNull(getActionBar()).setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -263,22 +252,27 @@ public class DeviceControlActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateConnectionState(final int resourceId) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mConnectionState.setText(resourceId);
-            }
-        });
-    }
-
     private void displayData(String data) {
         if (data != null) {
-            mDataField.setText(data);
+            mDataField.setText(data.substring(3));
             //mTrendData[mTimeSeconds] = Integer.parseInt(data);
             mTrendData[0] = mTimeSeconds;
             mTrendData[mTimeSeconds] = data.length();
-            mTrendData[mTimeSeconds] = Integer.valueOf(data.charAt(0));
+            mTrendData[mTimeSeconds] = data.charAt(0);
+            //Log.d(TAG, "DATA");
+        }
+    }
+
+    private void displayStatus(String data) {
+        if (data != null) {
+            mStatusField.setText(data);
+        }
+        //Log.d(TAG, "STATS");
+    }
+
+    private void displayTest(String data) {
+        if (data != null) {
+            mTestField.setText(data);
         }
     }
 
@@ -287,17 +281,19 @@ public class DeviceControlActivity extends Activity {
     // on the UI.
     private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null) return;
-        String uuid = null;
+        String uuid;
         String unknownServiceString = getResources().getString(R.string.unknown_service);
         String unknownCharaString = getResources().getString(R.string.unknown_characteristic);
-        ArrayList<HashMap<String, String>> gattServiceData = new ArrayList<HashMap<String, String>>();
+        ArrayList<HashMap<String, String>> gattServiceData = new ArrayList<>();
         ArrayList<ArrayList<HashMap<String, String>>> gattCharacteristicData
-                = new ArrayList<ArrayList<HashMap<String, String>>>();
-        mGattCharacteristics = new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
+                = new ArrayList<>();
+        mGattCharacteristics = new ArrayList<>();
 
         // Loops through available GATT Services.
+        String LIST_UUID = "UUID";
+        String LIST_NAME = "NAME";
         for (BluetoothGattService gattService : gattServices) {
-            HashMap<String, String> currentServiceData = new HashMap<String, String>();
+            HashMap<String, String> currentServiceData = new HashMap<>();
             uuid = gattService.getUuid().toString();
             if (uuid.startsWith("0000181a")){
                 currentServiceData.put(
@@ -306,29 +302,35 @@ public class DeviceControlActivity extends Activity {
                 gattServiceData.add(currentServiceData);
 
                 ArrayList<HashMap<String, String>> gattCharacteristicGroupData =
-                        new ArrayList<HashMap<String, String>>();
+                        new ArrayList<>();
                 List<BluetoothGattCharacteristic> gattCharacteristics =
                         gattService.getCharacteristics();
                 ArrayList<BluetoothGattCharacteristic> charas =
-                        new ArrayList<BluetoothGattCharacteristic>();
+                        new ArrayList<>();
 
                 // Loops through available Characteristics.
                 for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                     charas.add(gattCharacteristic);
-                    HashMap<String, String> currentCharaData = new HashMap<String, String>();
+                    HashMap<String, String> currentCharaData = new HashMap<>();
                     uuid = gattCharacteristic.getUuid().toString();
 
-                    if (uuid.startsWith("19b10001-e8f2")){
+                    if (uuid.startsWith("00002bd0")){
+                        Log.d(TAG,uuid);
+                        mCharacteristic = gattCharacteristic;
+                        mBluetoothLeService.setCharacteristicNotification(
+                                mCharacteristic, true);
+                    }
+                    else if (uuid.startsWith("00002bbb")){
+                        Log.d(TAG,uuid);
                         mCharacteristicStatus = gattCharacteristic;
+                        mBluetoothLeService.setCharacteristicNotification(
+                                mCharacteristicStatus, false);
                     }
-                    else if (uuid.startsWith("19b10001-e8f3")){
-                        mCharacteristicCommand = gattCharacteristic;
-                    }
-                    else if (uuid.startsWith("19b10001-e8f4")){
-                        mCharacteristicCOConcentration = gattCharacteristic;
-                    }
-                    else if(uuid.startsWith("19b10001-e8f5")){
-                        mCharacteristicCOTest = gattCharacteristic;
+                    else if (uuid.startsWith("00002af4")){
+                        Log.d(TAG,uuid);
+                        mCharacteristicTest = gattCharacteristic;
+                        mBluetoothLeService.setCharacteristicNotification(
+                                mCharacteristicTest, false);
                     }
                     currentCharaData.put(
                             LIST_NAME, SampleGattAttributes.lookup(uuid, unknownCharaString));
@@ -361,34 +363,33 @@ public class DeviceControlActivity extends Activity {
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BluetoothLeService.ACTION_STATUS_AVAILABLE);
+        intentFilter.addAction(BluetoothLeService.ACTION_TEST_AVAILABLE);
         return intentFilter;
     }
 
     //start timer function
     private void startTimer() {
-        cTimer = new CountDownTimer(15000, 1000) {
+        CountDownTimer cTimer = new CountDownTimer(15000, 1000) {
             public void onTick(long millisUntilFinished) {
 
                 mTimeSeconds = (int) (millisUntilFinished / 1000);
                 ((TextView) findViewById(R.id.data_timer)).setText(mTimeSeconds + " seconds");
-                //BluetoothGattService mCustomService = new BluetoothGattService(UUID.fromString("0000181A-0000-1000-8000-00805f9b34fb"),0);
-                //final BluetoothGattCharacteristic characteristic = mCustomService.getCharacteristic(UUID.fromString("19B10001-E8F4-537E-4F6C-D104768A1214"));
-                //BluetoothGattCharacteristic characteristic = new BluetoothGattCharacteristic(UUID.fromString("19B10001-E8F4-537E-4F6C-D104768A1214"),2,1);
-
-                mBluetoothLeService.readCharacteristic(mCharacteristicCOConcentration);
+                mBluetoothLeService.readCharacteristic(mCharacteristic);
             }
+
             public void onFinish() {
                 ((TextView) findViewById(R.id.data_timer)).setText("Test Completed");
 
-                mDataField.setText("Max = " + mTrendData[0] + "," + mTrendData[1] + "," + mTrendData[2] + mTrendData[3]);
-                try{
+                mDataField.setText("Max = " + mTrendData[0] + "," + mTrendData[1] + "," + mTrendData[2] + "," + mTrendData[3]);
+                try {
                     writeCustomFile(CUSTOM_FILE_NAME);
-                }
-                catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         };
+        mBluetoothLeService.writeCharacteristic(mCharacteristic);
         cTimer.start();
     }
 
@@ -439,28 +440,5 @@ public class DeviceControlActivity extends Activity {
             e.printStackTrace();
         }
 
-    }
-
-    public FTPClient connectftp()
-    {
-        //  Reference: https://stackoverflow.com/a/8761268/6667035
-        FTPClient ftp = new FTPClient();
-        try {
-            //  Reference: https://stackoverflow.com/a/55950845/6667035
-            //  The argument of `FTPClient.connect` method is hostname, not URL.
-            ftp.connect(FTPHostName, FTPPort);
-            boolean status = ftp.login(FTPUsername, FTPPassword);
-            if (status)
-            {
-                ftp.enterLocalPassiveMode();
-                ftp.setFileType(FTP.BINARY_FILE_TYPE);
-                ftp.sendCommand("OPTS UTF8 ON");
-            }
-            System.out.println("status : " + ftp.getStatus());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ftp;
     }
 }
