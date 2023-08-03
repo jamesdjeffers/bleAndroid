@@ -19,12 +19,13 @@ The Activities communicate with the Service, which in turn interacts with the [B
 [1]:http://developer.android.com/reference/android/app/Service.html
 [2]:https://developer.android.com/reference/android/bluetooth/BluetoothGatt.html
 
-Pre-requisites
---------------
+Known Issues
+------------
 
-- Android SDK 28
-- Android Build Tools v28.0.3
-- Android Support Repository
+1. Cannot subscribe to a characteristic without user click. Code exists for auto-connect, auto-subscribe but had bug.
+2. Can only subscribe to one characteristic at a time.
+3. Can NOT change characteristic read once selected
+4. Test results and status not displayed
 
 Screenshots
 -------------
@@ -33,6 +34,16 @@ Screenshots
 
 Getting Started
 ---------------
+
+1. Should list only specific devices with given name
+2. Should auto-subscribe to all characterisitcs available
+
+Pre-requisites
+--------------
+
+- Android SDK 28
+- Android Build Tools v28.0.3
+- Android Support Repository
 
 This sample uses the Gradle build system. To build this project, use the
 "gradlew build" command or use "Import Project" in Android Studio.
